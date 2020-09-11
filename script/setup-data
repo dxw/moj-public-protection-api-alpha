@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# script/setup-data: Set up the database for the first time
+
+if [ -f .env ]
+then
+  export $(cat .env | sed 's/#.*//g' | xargs)
+fi
+
+docker-compose exec sql-server-db /opt/mssql-tools/bin/sqlcmd \
+   -S localhost -U SA -P "$SA_PASSWORD" \
+   -i /srv/data/PPUD.sql

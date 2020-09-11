@@ -8,3 +8,6 @@ LICENCE
 .*
 !.*.*
 !.*/
+
+.env.example
+*.sql

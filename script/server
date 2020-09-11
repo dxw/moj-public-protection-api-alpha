@@ -10,5 +10,8 @@ cd "$(dirname "$0")/.."
 echo "==> Updating..."
 script/update
 
+echo "==> Starting MSSQL database Docker container"
+docker-compose up -d && script/setup-data
+
 echo "==> Starting the development server..."
 npm start
