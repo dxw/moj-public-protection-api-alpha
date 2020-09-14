@@ -8,4 +8,5 @@ module.exports = {
     password: process.env.SA_PASSWORD,
     database: "PPUD",
   },
+  debug: true
 };

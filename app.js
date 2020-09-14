@@ -4,11 +4,12 @@ const knex = require("knex")(knexfile);
 const { Model } = require('objection');
 const app = express();
 Model.knex(knex);
-const Review = require("./models/review")
+const Review = require("./models/Review")
 
 app.get("/reviews", async function (req, res) {
-  const reviews = await Review.query();
-  res.json({ reviews: reviews });
+  const query = Review.query();
+  query.withGraphJoined('[reason]')
+  res.json({ reviews: await query });
 });
 
 module.exports = { app };
