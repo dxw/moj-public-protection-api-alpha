@@ -1,21 +1,14 @@
-var express = require("express");
-var knexfile = require("./knexfile");
-var knex = require("knex")(knexfile);
-var app = express();
+const express = require("express");
+const knexfile = require("./knexfile");
+const knex = require("knex")(knexfile);
+const { Model } = require('objection');
+const app = express();
+Model.knex(knex);
+const Review = require("./models/review")
 
-app.get("/reviews", function (req, res) {
-  knex("REVIEW")
-    .select()
-    .then((rows) => {
-      res.json({ reviews: rows });
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    })
-    .finally(() => {
-      knex.destroy();
-    });
+app.get("/reviews", async function (req, res) {
+  const reviews = await Review.query();
+  res.json({ reviews: reviews });
 });
 
 module.exports = { app };
