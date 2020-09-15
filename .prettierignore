@@ -9,5 +9,7 @@ LICENCE
 !.*.*
 !.*/
 
+.idea
+
 .env.example
 *.sql
