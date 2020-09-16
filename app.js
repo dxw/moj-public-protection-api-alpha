@@ -8,7 +8,7 @@ const Review = require("./models/Review");
 
 app.get("/reviews", async function (req, res) {
   const query = Review.query();
-  query.withGraphJoined("[reason]");
+  query.withGraphJoined("[reason,offender]");
   res.json({ reviews: await query });
 });
 
