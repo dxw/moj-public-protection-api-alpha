@@ -1,6 +1,7 @@
 const { Model } = require("objection");
 const ReviewReason = require("./ReviewReason");
 const Offender = require("./Offender");
+const Document = require("./Document");
 
 class Review extends Model {
   static get tableName() {
@@ -53,6 +54,14 @@ class Review extends Model {
         join: {
           from: "REVIEW.OFFENDER_ID",
           to: "OFFENDER.OFFENDER_ID",
+        },
+      },
+      documents: {
+        relation: Model.HasManyRelation,
+        modelClass: Document,
+        join: {
+          from: "REVIEW.REVIEW_ID",
+          to: "DOCUMENTS.REVIEW",
         },
       },
     };

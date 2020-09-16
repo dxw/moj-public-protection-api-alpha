@@ -9,7 +9,7 @@ const Offender = require("./models/Offender");
 
 app.get("/reviews", async function (req, res) {
   const query = Review.query();
-  query.withGraphJoined("[reason,offender]");
+  query.withGraphJoined("[reason,offender,documents]");
   res.json({ reviews: await query });
 });
 
@@ -23,7 +23,7 @@ app.get("/offender/:identifier/:value/reviews", async function (req, res) {
   const columnName = Offender.propertyNameToColumnName(req.params.identifier);
   const subQuery = Offender.query().where(columnName, req.params.value);
   const query = Offender.relatedQuery("reviews").for(subQuery);
-  query.withGraphJoined("[reason,offender]");
+  query.withGraphJoined("[reason,offender,documents]");
   res.json({ reviews: await query });
 });
 
