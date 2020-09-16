@@ -12,7 +12,12 @@ class Document extends Model {
     return "ID";
   }
   fileUrl() {
-    return `${process.env.SERVER_URL}/documents/${this.id}`;
+    return `${process.env.SERVER_URL}/documents/${this.id}/download`;
+  }
+  canBeDownloaded() {
+    // Check the requesting user has permission to download the file
+    // For prototyping purposes we will always return true
+    return true;
   }
   static get columnNameMappers() {
     return createColumnMappers({
