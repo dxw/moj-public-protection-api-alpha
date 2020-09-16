@@ -1,4 +1,5 @@
 const { Model } = require("objection");
+const { createColumnMappers } = require("../utils");
 
 class Offender extends Model {
   static get tableName() {
@@ -9,16 +10,21 @@ class Offender extends Model {
     return "OFFENDER_ID";
   }
   static get columnNameMappers() {
+    return createColumnMappers({
+      PRISON_NUMBER: "prisonNumber",
+      CRO_PNC: "croNumber",
+    });
+  }
+  static get relationMappings() {
+    const Review = require("./Review");
     return {
-      parse(obj) {
-        return {
-          prisonNumber: obj.PRISON_NUMBER,
-          croNumber: obj.CRO_PNC,
-        };
-      },
-
-      format() {
-        throw "Not implemented";
+      reviews: {
+        relation: Model.HasManyRelation,
+        modelClass: Review,
+        join: {
+          from: "OFFENDER.OFFENDER_ID",
+          to: "REVIEW.OFFENDER_ID",
+        },
       },
     };
   }
