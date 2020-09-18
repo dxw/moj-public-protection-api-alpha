@@ -1,6 +1,30 @@
 const { Model } = require("objection");
 const { createColumnMappers } = require("../utils");
 
+/**
+ * @swagger
+ *
+ * definitions:
+ *   Document:
+ *     type: object
+ *     properties:
+ *       id:
+ *         type: integer
+ *       type:
+ *         type: string
+ *       title:
+ *         type: string
+ *       comments:
+ *         type: string
+ *       extension:
+ *         type: string
+ *       draft:
+ *         type: boolean
+ *       fileUrl:
+ *         type: string
+ *
+ */
+
 class Document extends Model {
   static get virtualAttributes() {
     return ["fileUrl"];

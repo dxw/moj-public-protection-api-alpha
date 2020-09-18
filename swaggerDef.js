@@ -9,7 +9,7 @@ const options = {
     },
   },
   // Path to the API docs
-  apis: ["./app.js"],
+  apis: ["./models/**.js", "./app.js"],
 };
 
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
