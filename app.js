@@ -4,18 +4,142 @@ const mime = require("mime-types");
 const knexfile = require("./knexfile");
 const knex = require("knex")(knexfile);
 const { Model } = require("objection");
+const swaggerDef = require("./swaggerDef");
+const swaggerUi = require("swagger-ui-express");
 const app = express();
 Model.knex(knex);
 const Review = require("./models/Review");
 const Offender = require("./models/Offender");
 const Document = require("./models/Document");
 
+/**
+ * @swagger
+ *
+ * definitions:
+ *   Review:
+ *     type: object
+ *     properties:
+ *       id:
+ *         type: integer
+ *       review_date:
+ *         type: string
+ *         format: date-time
+ *       offender:
+ *         type: object
+ *         properties:
+ *           prisonNumber:
+ *             type: string
+ *           croNumber:
+ *             type: string
+ *       comments:
+ *         type: string
+ *       video_link:
+ *         type: boolean
+ *       victim_details_obtained:
+ *         type: boolean
+ *       advocate_details:
+ *         type: string
+ *       witness_details:
+ *         type: string
+ *       panel_details:
+ *         type: string
+ *       solicitor:
+ *         type: object
+ *         properties:
+ *           firm:
+ *             type: string
+ *           address:
+ *             type: string
+ *           phone_number:
+ *             type: string
+ *           fax_number:
+ *             type: string
+ *           email_address:
+ *             type: string
+ *       reason:
+ *         type: object
+ *         properties:
+ *           description:
+ *             type: string
+ *       documents:
+ *         type: array
+ *         items:
+ *           $ref: '#/definitions/Document'
+ *
+ *   Document:
+ *     type: object
+ *     properties:
+ *       id:
+ *         type: integer
+ *       type:
+ *         type: string
+ *       title:
+ *         type: string
+ *       comments:
+ *         type: string
+ *       extension:
+ *         type: string
+ *       draft:
+ *         type: boolean
+ *       fileUrl:
+ *         type: string
+ *
+ */
+
+/**
+ * @swagger
+ *
+ * /reviews:
+ *   get:
+ *     description: List all the reviews
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: '#/definitions/Review'
+ */
 app.get("/reviews", async function (req, res) {
   const query = Review.query();
   query.withGraphJoined("[reason,offender,documents]");
   res.json({ reviews: await query });
 });
 
+/**
+ * @swagger
+ *
+ * /offender/:identifier/:value/reviews:
+ *   get:
+ *     description: List all the reviews for a specific offender
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: identifier
+ *         description: The offender identifier name
+ *         type: string
+ *         enum:
+ *             - croNumber
+ *             - prisonNumber
+ *         required: true
+ *       - in: path
+ *         name: value
+ *         description: The value of the offender identifier
+ *         type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: OK
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: '#/definitions/Review'
+ *       400:
+ *         description: Malformed request
+ */
 app.get("/offender/:identifier/:value/reviews", async function (req, res) {
   const allowedIdentifiers = ["croNumber", "prisonNumber"];
   if (!allowedIdentifiers.includes(req.params.identifier)) {
@@ -30,6 +154,28 @@ app.get("/offender/:identifier/:value/reviews", async function (req, res) {
   res.json({ reviews: await query });
 });
 
+/**
+ * @swagger
+ *
+ * /documents/:documentId/download:
+ *   get:
+ *     description: Download a document
+ *     produces:
+ *       - application/pdf
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         description: The document ID
+ *         type: integer
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: OK
+ *         schema:
+ *           type: file
+ *       403:
+ *         description: Not authorised
+ */
 app.get("/documents/:documentId/download", async function (req, res) {
   const document = await Document.query().findById(req.params.documentId);
   if (document.canBeDownloaded()) {
@@ -49,5 +195,12 @@ app.get("/documents/:documentId/download", async function (req, res) {
     res.status(403).json({ error: `Access denied` });
   }
 });
+
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerDef);
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDef));
 
 module.exports = { app };
