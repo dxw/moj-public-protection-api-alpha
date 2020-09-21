@@ -13,3 +13,4 @@ LICENCE
 
 .env.example
 *.sql
+*.pdf
